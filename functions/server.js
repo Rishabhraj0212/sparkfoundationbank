@@ -6,7 +6,7 @@ const path = require('path');
 
 // Middleware
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(express.static(path.join(__dirname, '..')));
+app.use(express.static(path.join(__dirname, '../')));
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, '../views'));
 
@@ -16,8 +16,15 @@ app.get('/', (req, res) => {
 });
 
 // Import your routes
-const router = require('../router/router');
-app.use('/', router);
+try {
+  const router = require('../router/router');
+  app.use('/', router);
+} catch (error) {
+  console.error('Error loading router:', error);
+  app.get('*', (req, res) => {
+    res.status(500).send('Server configuration error');
+  });
+}
 
 // Export the serverless handler
-exports.handler = serverless(app); 
+module.exports.handler = serverless(app); 
